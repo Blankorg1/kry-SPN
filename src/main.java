@@ -20,7 +20,38 @@ public class main {
     k2 = 1001 0100 1101 0110
     k3 = 0100 1101 0110 0011
      */
-    public static void main(String arcs[]) {
-        System.out.println("Kry is fun");
+    public void main(String arcs[]) {
+        decrypt("10000001 01101011 00000001");
+    }
+
+    public void encrypt(String plain) {
+
+    }
+
+
+    public void decrypt(String binary) {
+        // delete all spaces
+        String formatted = binary.replace(" ", "");
+        int len = formatted.length();
+
+        // check that binary are hole bytes
+        if (len % 8 != 0) {
+            throw new IllegalArgumentException("Binary string length must be multiple of 8");
+        }
+
+        byte[] be = new byte[len / 8];
+
+        // filles bytearray with the to decode bytes one byte at a time 
+        for (int i = 0; i < be.length; i++) {
+            String oneByte = formatted.substring(i * 8, i * 8 + 8);
+            be[i] = (byte) Integer.parseInt(oneByte, 2);
+        }
+
+        be[0] = (byte) (be[0] ^ 0b01001101);
+
+        
+        for (byte bi : be) {
+            System.out.println(bi);
+        }
     }
 }
