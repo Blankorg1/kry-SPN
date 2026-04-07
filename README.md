@@ -1,3 +1,8 @@
+# How to run:
+```bash
+java src/Main.java
+```
+
 ## An easy implementation of the substitution–permutation network in Java
 
 This Project is for deeper understanding of the SPN operations to encrypt and decrypt massages exchanged between two endpoints.
