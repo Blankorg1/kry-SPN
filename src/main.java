@@ -116,17 +116,14 @@ public class Main {
 
   public static int applySBox(int chiffreBlock) {
     int resultSBox = 0;
-    for (int i = 0; i < M; ++i) {
-      int wordChunk = chiffreBlock & 0xF;
-      chiffreBlock = chiffreBlock >> N;
+    for (int i = M - 1; i >= 0; --i) {
+      int shift = i * N;
+      int wordChunk = (chiffreBlock >> shift) & 0xF;
       int lookup = S_BOX[wordChunk];
-      resultSBox = (resultSBox << N) | lookup;
+      resultSBox |= (lookup << shift);
     }
 
     return resultSBox;
-  }
-
-  public static void applyPermutation() {
   }
 
   public static String readChiffreFile(String path) throws IOException {
