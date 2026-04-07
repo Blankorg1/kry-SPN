@@ -85,9 +85,14 @@ public class Main {
   public static String decryptCTR(String chiffreText) {
     String bitsResult = "";
 
-    for (int blockCount = 0; blockCount < (chiffreText.length() / BLOCK_SIZE); ++blockCount) {
-      int chiffreBlock = getChunkChiffre(chiffreText, blockCount);
-      int counterBlock = blockCount;
+    int initialCounter = getChunkChiffre(chiffreText, 0);
+
+    int blockCount = (chiffreText.length() / BLOCK_SIZE);
+
+    for (int blockIndex = 1; blockIndex < blockCount; ++blockIndex) {
+      int chiffreBlock = getChunkChiffre(chiffreText, blockIndex);
+      int counterBlock = initialCounter + (blockIndex - 1);
+
       int keyStreamBlock = encryptBlock(counterBlock);
       int textBlock = xor(chiffreBlock, keyStreamBlock);
       String bits16 = String.format("%16s", Integer.toBinaryString(textBlock)).replace(' ', '0');
@@ -136,7 +141,6 @@ public class Main {
 
     return cipherText.substring(0, i);
   }
-
 
   private static int applyBitPermutation(int chiffreBlock) {
     int result = 0;
