@@ -59,7 +59,7 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     String chiffreText = readChiffreFile("./test.txt");
-    encrypt(chiffreText);
+    System.out.println(encrypt(chiffreText));
   }
 
   public static String encrypt(String chiffreText) {
