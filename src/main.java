@@ -34,7 +34,8 @@ public class Main {
   // m = 4 wordcount
   // s = 32 keylength
 
-  private static final String KEY = "00111010100101001101011000111111";
+  // private static final String KEY = "00111010100101001101011000111111";
+  private static final String KEY = "00010001001010001000110000000000";
   // private static final int R = 4; // number of rounds
   private static final int R = 4; // number of rounds
   private static final int N = 4; // bits per S-box input/output
@@ -57,38 +58,45 @@ public class Main {
   };
 
   public static void main(String[] args) throws IOException {
-    String chiffreText = readChiffreFile("./chiffre.txt");
+    String chiffreText = readChiffreFile("./test.txt");
     encrypt(chiffreText);
   }
 
   public static String encrypt(String chiffreText) {
     String encrypted = "";
-    for (int round = 0; round < R; ++round) {
-      int roundKey = calcRoundKey(round);
-      int chiffreBlock = getChunkChiffre(chiffreText, round);
-      int resultXor = xorRoundKey(chiffreBlock, roundKey);
-      int resultSBox = applySBox(resultXor);
-      int resultBit = applyBitPermutation(resultSBox);
-      String bits16 = String.format("%16s", Integer.toBinaryString(resultBit)).replace(' ', '0');
+
+    for (int blockCount = 0; blockCount < (chiffreText.length() / BLOCK_SIZE); ++blockCount) {
+      // initial step round 0
+      int chiffreBlock = getChunkChiffre(chiffreText, blockCount);
+      chiffreBlock = xorRoundKey(chiffreBlock, calcRoundKey(0));
+
+      // rounds 1-3
+      for (int round = 1; round < R; ++round) {
+        chiffreBlock = applySBox(chiffreBlock);
+        chiffreBlock = applyBitPermutation(chiffreBlock);
+        chiffreBlock = xorRoundKey(chiffreBlock, calcRoundKey(round));
+      }
+
+      // final round
+      chiffreBlock = applySBox(chiffreBlock);
+      chiffreBlock = xorRoundKey(chiffreBlock, calcRoundKey(R));
+
+      String bits16 = String.format("%16s", Integer.toBinaryString(chiffreBlock)).replace(' ', '0');
       encrypted += bits16;
     }
 
-    System.out.println(encrypted);
-
-    return null;
+    return encrypted;
   }
 
   private static int applyBitPermutation(int chiffreBlock) {
-    int resultBit = 0;
+    int result = 0;
 
-    for (int i = 0; i < M; ++i) {
-      int wordChunk = chiffreBlock & 0xF;
-      chiffreBlock = chiffreBlock >> N;
-      int lookup = BIT_PERMUTATION[wordChunk];
-      resultBit = (resultBit << N) | lookup;
+    for (int i = 0; i < BLOCK_SIZE; ++i) {
+      int bit = (chiffreBlock >> i) & 0b1;
+      result |= (bit << BIT_PERMUTATION[i]);
     }
 
-    return resultBit;
+    return result;
   }
 
   public static int getChunkChiffre(String chiffreText, int round) {
